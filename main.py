@@ -6,7 +6,7 @@ import whisper
 
 BOT_TOKEN = '8101388926:AAEjCS7kwSp8EitsYo8m11rT4SeQzUsSf4M'
 
-model = whisper.load_model("base")
+model = whisper.load_model("tiny")
 
 def start(update: Update, context: CallbackContext):
     user_name = update.message.from_user.first_name
@@ -62,7 +62,7 @@ def voice(update: Update, context: CallbackContext):
 
     elif action == 'recognize':
         text = transcribe_audio(file_path)
-        update.message.reply_text(f'Распознанный текст: {text}')
+        update.message.reply_text(text)
 
     os.remove(file_path)
 
