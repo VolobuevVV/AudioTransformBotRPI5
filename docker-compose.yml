@@ -1,0 +1,16 @@
+services:
+  voice_transform:
+    image: voice_transform
+    container_name: voice_transform
+    #volumes:
+      #- cars_images_volume:/CarsImages
+    #environment:
+      #- VIDEO_PATH=rtsp://admin:123456789qwerty!@5.227.121.121:554/cam/realmonitor?channel=1&subtype=0
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+#volumes:
+  #timescale_data:
