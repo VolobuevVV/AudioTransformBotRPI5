@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y libopenblas-base && rm -rf /var/lib/apt
 RUN apt-get update
 RUN apt-get install -y build-essential cmake libffi-dev python3-dev && rm -rf /var/lib/apt/lists/*
 RUN apt-get install opencl-headers ocl-icd-libopencl1 clinfo && rm -rf /var/lib/apt/lists/*
-RUN pip3 install pyopencl
+RUN pip3.9 install pyopencl
 COPY . .
 
 ENTRYPOINT ["python3.9", "main.py"]
