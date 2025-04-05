@@ -5,12 +5,10 @@ import os
 
 BOT_TOKEN = '8101388926:AAEjCS7kwSp8EitsYo8m11rT4SeQzUsSf4M'
 
-
 def start(update: Update, context: CallbackContext):
-    update.message.reply_text('Привет! 😊 Отправь мне голосовое сообщение, и я изменю его тон. 🎶 '
+    user_name = update.message.from_user.first_name
+    update.message.reply_text(f'Привет, {user_name}! 😊 Отправь мне голосовое сообщение, и я изменю его тон. 🎶 '
                               'Разработчик - Владимир Волобуев @volobuevv 👨‍💻')
-
-
 
 def voice(update: Update, context: CallbackContext):
     file = update.message.voice.get_file()
@@ -33,20 +31,25 @@ def voice(update: Update, context: CallbackContext):
     sound.export(output_mp3_path, format="mp3")
     sound.export(output_wav_path, format="wav")
 
+    # Отправляем измененный голос
     with open(output_ogg_path, 'rb') as f:
-        update.message.reply_voice(voice=InputFile(f), caption="Вот твой голос с пониженным тоном (OGG)!")
+        update.message.reply_voice(voice=InputFile(f), caption="Вот твой голос с пониженным тоном!")
+
+    # Отправляем файлы для скачивания
+    with open(output_ogg_path, 'rb') as f:
+        update.message.reply_document(document=InputFile(f), caption="Скачай OGG файл")
 
     with open(output_mp3_path, 'rb') as f:
-        update.message.reply_voice(voice=InputFile(f), caption="Вот твой голос с пониженным тоном (MP3)!")
+        update.message.reply_document(document=InputFile(f), caption="Скачай MP3 файл")
 
     with open(output_wav_path, 'rb') as f:
-        update.message.reply_voice(voice=InputFile(f), caption="Вот твой голос с пониженным тоном (WAV)!")
+        update.message.reply_document(document=InputFile(f), caption="Скачай WAV файл")
 
+    # Удаляем временные файлы
     os.remove(file_path)
     os.remove(output_ogg_path)
     os.remove(output_mp3_path)
     os.remove(output_wav_path)
-
 
 def main():
     updater = Updater(BOT_TOKEN)
@@ -55,7 +58,6 @@ def main():
     dispatcher.add_handler(MessageHandler(Filters.voice, voice))
     updater.start_polling()
     updater.idle()
-
 
 if __name__ == '__main__':
     main()
