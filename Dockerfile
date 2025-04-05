@@ -37,7 +37,7 @@ RUN pip install torch-2.0.0a0+gite9ebda2-cp39-cp39-linux_aarch64.whl
 RUN rm torch-2.0.0a0+gite9ebda2-cp39-cp39-linux_aarch64.whl
 
 COPY requirements.txt ./
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
