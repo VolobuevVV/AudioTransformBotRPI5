@@ -1,5 +1,5 @@
 FROM balenalib/raspberrypi5-alpine-python:latest
-
+WORKDIR /root/
 RUN apk update && apk add --no-cache \
     build-base \
     ffmpeg \
@@ -17,7 +17,5 @@ COPY requirements.txt ./
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . .
-
-WORKDIR /root/
 
 ENTRYPOINT ["python3", "main.py"]
