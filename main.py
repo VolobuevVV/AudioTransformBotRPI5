@@ -18,6 +18,9 @@ def voice(update: Update, context: CallbackContext):
     new_sample_rate = int(sound.frame_rate * (2 ** octaves))
     sound = sound._spawn(sound.raw_data, overrides={'frame_rate': new_sample_rate})
 
+    sound = sound.set_frame_rate(44100)
+    sound = sound.set_channels(1)
+
     output_path = "voice_lowered.ogg"
     sound.export(output_path, format="ogg")
 
