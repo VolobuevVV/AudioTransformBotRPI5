@@ -24,28 +24,17 @@ def voice(update: Update, context: CallbackContext):
     sound = sound.set_channels(1)
 
     output_ogg_path = "voice_lowered.ogg"
-    output_mp3_path = "voice_lowered.mp3"
     output_wav_path = "voice_lowered.wav"
-
-    sound.export(output_ogg_path, format="ogg")
-    sound.export(output_mp3_path, format="mp3")
     sound.export(output_wav_path, format="wav")
 
     with open(output_ogg_path, 'rb') as f:
         update.message.reply_voice(voice=InputFile(f), caption="Вот твой голос с пониженным тоном!")
-
-    with open(output_ogg_path, 'rb') as f:
-        update.message.reply_document(document=InputFile(f))
-
-    with open(output_mp3_path, 'rb') as f:
-        update.message.reply_document(document=InputFile(f))
 
     with open(output_wav_path, 'rb') as f:
         update.message.reply_document(document=InputFile(f))
 
     os.remove(file_path)
     os.remove(output_ogg_path)
-    os.remove(output_mp3_path)
     os.remove(output_wav_path)
 
 def main():
