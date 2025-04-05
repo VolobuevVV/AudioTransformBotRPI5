@@ -2,22 +2,16 @@ FROM balenalib/raspberrypi4-64-debian:bullseye
 
 WORKDIR /root/
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget build-essential libssl-dev zlib1g-dev libncurses5-dev libreadline-dev \
+    libsqlite3-dev libgdbm-dev libbz2-dev libexpat1-dev liblzma-dev \
+    libjpeg-dev libpng-dev libtiff-dev libavcodec-dev libavformat-dev libswscale-dev \
+    libv4l-dev libxvidcore-dev libx264-dev libgtk-3-dev libatlas-base-dev gfortran \
+    cmake git unzip ccache \
     ffmpeg \
-    libmagic-dev \
-    libffi-dev \
-    libjpeg-dev \
-    libopenblas-dev \
-    libopenmpi-dev \
-    libomp-dev \
-    zlib1g-dev \
-    wget \
-    cmake \
-    gfortran \
-    bash \
-    && rm -rf /var/lib/apt/lists/*
-
+    v4l2loopback-utils \
+    ocl-icd-libopencl1 clinfo && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN ln -s /usr/bin/ccache /usr/local/bin/cc
 
