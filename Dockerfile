@@ -15,13 +15,21 @@ RUN apt-get update && apt-get install -y \
     wget \
     cmake \
     gfortran \
-    python3-pip \
-    python3-setuptools \
     bash \
     && rm -rf /var/lib/apt/lists/*
 
-RUN python3 -m ensurepip --upgrade && \
-    pip3 install --no-cache-dir --upgrade pip
+
+RUN ln -s /usr/bin/ccache /usr/local/bin/cc
+
+RUN wget https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tgz && \
+    tar xzf Python-3.9.14.tgz && \
+    cd Python-3.9.14 && \
+    ./configure --enable-optimizations --with-lto && \
+    make -j$(nproc) altinstall && \
+    cd .. && \
+    rm -rf Python-3.9.14 Python-3.9.14.tgz
+
+RUN wget https://bootstrap.pypa.io/get-pip.py && python3.9 get-pip.py && rm get-pip.py
 
 RUN pip3 install gdown
 
