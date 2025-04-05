@@ -1,5 +1,6 @@
 from telegram import Update, InputFile
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from pydub import AudioSegment
 import os
 
 BOT_TOKEN = '8101388926:AAEjCS7kwSp8EitsYo8m11rT4SeQzUsSf4M'
@@ -12,10 +13,19 @@ def voice(update: Update, context: CallbackContext):
     file_path = "voice.ogg"
     file.download(file_path)
 
-    with open(file_path, 'rb') as f:
-        update.message.reply_voice(voice=InputFile(f), caption="Вот твой голос без изменений!")
+    sound = AudioSegment.from_ogg(file_path)
+    octaves = -0.5
+    new_sample_rate = int(sound.frame_rate * (2 ** octaves))
+    sound = sound._spawn(sound.raw_data, overrides={'frame_rate': new_sample_rate})
+
+    output_path = "voice_lowered.ogg"
+    sound.export(output_path, format="ogg")
+
+    with open(output_path, 'rb') as f:
+        update.message.reply_voice(voice=InputFile(f), caption="Вот твой голос с пониженным тоном!")
 
     os.remove(file_path)
+    os.remove(output_path)
 
 def main():
     updater = Updater(BOT_TOKEN)
