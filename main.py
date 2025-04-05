@@ -15,11 +15,10 @@ def voice(update: Update, context: CallbackContext):
 
     sound = AudioSegment.from_ogg(file_path)
     octaves = -0.5
-    new_sample_rate = int(sound.frame_rate * (2 ** octaves))
-    sound = sound._spawn(sound.raw_data, overrides={'frame_rate': new_sample_rate})
+    sound = sound._spawn(sound.raw_data, overrides={'frame_rate': sound.frame_rate})
 
-    sound = sound.set_frame_rate(44100)
-    sound = sound.set_channels(1)
+    # Применяем изменение тональности без изменения длительности
+    sound = sound.speedup(playback_speed=2 ** octaves)
 
     output_path = "voice_lowered.ogg"
     sound.export(output_path, format="ogg")
