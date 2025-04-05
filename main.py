@@ -43,8 +43,6 @@ def voice(update: Update, context: CallbackContext):
     with open(output_wav_path, 'rb') as f:
         update.message.reply_document(document=InputFile(f))
 
-    update.message.reply_text('Разработчик - Владимир Волобуев @volobuevv 👨‍💻')
-
     os.remove(file_path)
     os.remove(output_ogg_path)
     os.remove(output_mp3_path)
