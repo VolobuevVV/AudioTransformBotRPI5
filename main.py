@@ -9,6 +9,7 @@ BOT_TOKEN = '8101388926:AAEjCS7kwSp8EitsYo8m11rT4SeQzUsSf4M'
 
 model = whisper.load_model("tiny")
 
+
 def start(update: Update, context: CallbackContext):
     user_name = update.message.from_user.first_name
     keyboard = [['Преобразовать голос', 'Распознать голос']]
@@ -30,13 +31,6 @@ def transcribe_audio(audio_file):
     result = model.transcribe(audio_file, language="ru")
     return result["text"]
 
-def convert_audio_format(input_file_path, output_format="wav"):
-    sound = AudioSegment.from_ogg(input_file_path)
-    sound = sound.set_frame_rate(16000)
-    output_path = f"converted.{output_format}"
-    sound.export(output_path, format=output_format)
-    return output_path
-
 def voice(update: Update, context: CallbackContext):
     action = context.user_data.get('action')
     if not action:
@@ -47,14 +41,12 @@ def voice(update: Update, context: CallbackContext):
     file_path = "voice.ogg"
     file.download(file_path)
 
-    converted_path = convert_audio_format(file_path)
-
     if action == 'transform':
-        sound = AudioSegment.from_wav(converted_path)
+        sound = AudioSegment.from_ogg(file_path)
         octaves = -0.5
         new_sample_rate = int(sound.frame_rate * (2 ** octaves))
         sound = sound._spawn(sound.raw_data, overrides={'frame_rate': new_sample_rate})
-        sound = sound.set_frame_rate(16000)
+        sound = sound.set_frame_rate(44100).set_channels(1)
 
         output_ogg_path = "voice_lowered.ogg"
         output_wav_path = "voice_lowered.wav"
@@ -71,11 +63,10 @@ def voice(update: Update, context: CallbackContext):
         os.remove(output_wav_path)
 
     elif action == 'recognize':
-        text = transcribe_audio(converted_path)
+        text = transcribe_audio(file_path)
         update.message.reply_text(text)
 
     os.remove(file_path)
-    os.remove(converted_path)
 
 def main():
     updater = Updater(BOT_TOKEN)
