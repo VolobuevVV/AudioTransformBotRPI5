@@ -1,3 +1,4 @@
+import torch
 from telegram import Update, InputFile, ReplyKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from pydub import AudioSegment
@@ -6,7 +7,9 @@ import whisper
 
 BOT_TOKEN = '8101388926:AAEjCS7kwSp8EitsYo8m11rT4SeQzUsSf4M'
 
-model = whisper.load_model("base")
+model = whisper.load_model("tiny")
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
 
 def start(update: Update, context: CallbackContext):
     user_name = update.message.from_user.first_name
@@ -61,6 +64,7 @@ def voice(update: Update, context: CallbackContext):
         os.remove(output_wav_path)
 
     elif action == 'recognize':
+        update.message.reply_text(f'Используется девайс: {device}')
         text = transcribe_audio(file_path)
         update.message.reply_text(text)
 
