@@ -6,7 +6,7 @@ import whisper
 
 BOT_TOKEN = '8101388926:AAEjCS7kwSp8EitsYo8m11rT4SeQzUsSf4M'
 
-model = whisper.load_model("large")
+model = whisper.load_model("base")
 
 def start(update: Update, context: CallbackContext):
     user_name = update.message.from_user.first_name
