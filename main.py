@@ -25,6 +25,8 @@ def voice(update: Update, context: CallbackContext):
 
     output_ogg_path = "voice_lowered.ogg"
     output_wav_path = "voice_lowered.wav"
+
+    sound.export(output_ogg_path, format="ogg")
     sound.export(output_wav_path, format="wav")
 
     with open(output_ogg_path, 'rb') as f:
