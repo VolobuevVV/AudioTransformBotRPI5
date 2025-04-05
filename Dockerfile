@@ -39,6 +39,8 @@ RUN pip3.9 install --no-cache-dir -r requirements.txt
 
 RUN apt-get update && apt-get install -y libopenmpi-dev && rm -rf /var/lib/apt/lists/*
 RUN apt-get update && apt-get install -y libopenblas-base && rm -rf /var/lib/apt/lists/*
+RUN apt-get install opencl-headers ocl-icd-libopencl1 clinfo && rm -rf /var/lib/apt/lists/*
+RUN pip3 install pyopencl
 COPY . .
 
 ENTRYPOINT ["python3.9", "main.py"]
