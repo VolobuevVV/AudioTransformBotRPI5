@@ -36,6 +36,8 @@ RUN rm torch-2.0.0a0+gite9ebda2-cp39-cp39-linux_aarch64.whl
 COPY requirements.txt ./
 RUN pip3.9 install --no-cache-dir -r requirements.txt
 
+RUN apt-get update && apt-get install -y libopenmpi-dev && rm -rf /var/lib/apt/lists/*
+
 COPY . .
 
 ENTRYPOINT ["python3.9", "main.py"]
