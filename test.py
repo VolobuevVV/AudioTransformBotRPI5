@@ -1,7 +1,7 @@
 import whisper
 
 # Загружаем модель
-model = whisper.load_model("base")  # Вы можете использовать другие модели: tiny, small, medium, large
+model = whisper.load_model("large")  # Вы можете использовать другие модели: tiny, small, medium, large
 
 def transcribe_audio(audio_file):
     result = model.transcribe(audio_file, language="ru")
