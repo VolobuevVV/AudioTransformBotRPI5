@@ -25,14 +25,14 @@ RUN wget https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tgz && \
 
 RUN wget https://bootstrap.pypa.io/get-pip.py && python3.9 get-pip.py && rm get-pip.py
 
-RUN pip3 install gdown
+RUN pip install gdown
 
-RUN pip3 install setuptools==58.3.0
-RUN pip3 install Cython
+RUN pip install setuptools==58.3.0
+RUN pip install Cython
 
 RUN gdown https://drive.google.com/uc?id=1mPlhwM47Ub3SwQyufgFj3JJ9oB_wrU5D
 
-RUN pip3 install torch-2.0.0a0+gite9ebda2-cp39-cp39-linux_aarch64.whl
+RUN pip install torch-2.0.0a0+gite9ebda2-cp39-cp39-linux_aarch64.whl
 
 RUN rm torch-2.0.0a0+gite9ebda2-cp39-cp39-linux_aarch64.whl
 
