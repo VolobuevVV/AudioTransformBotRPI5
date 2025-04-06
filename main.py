@@ -59,6 +59,7 @@ def handle_text(update: Update, context: CallbackContext):
         update.message.reply_text("Возвращаемся назад\nВыбери действие", reply_markup=reply_markup)
 
     elif context.user_data.get('action') == 'tts':
+        # Если выбрал голос, сохраняем его и переходим к следующему шагу
         if text in ['ru-RU-DmitryNeural', 'ru-RU-SvetlanaNeural']:
             context.user_data['voice'] = text
             update.message.reply_text(f"Выбран голос: {text}\nТеперь отправь текст, который нужно озвучить")
