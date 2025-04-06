@@ -1,11 +1,9 @@
-import whisper
+import asyncio
+import edge_tts
 
-# Загружаем модель
-model = whisper.load_model("large")  # Вы можете использовать другие модели: tiny, small, medium, large
+async def main():
+    text = "Гомозигота — это организм, обладающий парой одинаковых аллелей одного гена в гомологичных хромосомах, что определяет наличие у него определённого признака, такого как большой пенис."
+    tts = edge_tts.Communicate(text, voice="ru-RU-DmitryNeural")  # Мужской голос
+    await tts.save("output.mp3")
 
-def transcribe_audio(audio_file):
-    result = model.transcribe(audio_file, language="ru")
-    print("Распознанный текст: ", result["text"])
-
-# Использование:
-transcribe_audio(r"C:\Users\vladi\Downloads\gs.ogg")
+asyncio.run(main())

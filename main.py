@@ -3,6 +3,8 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 from pydub import AudioSegment
 import os
 import whisper
+import asyncio
+import edge_tts
 
 BOT_TOKEN = '8101388926:AAEjCS7kwSp8EitsYo8m11rT4SeQzUsSf4M'
 
@@ -13,10 +15,11 @@ preloaded_models = {
 }
 
 user_models = {}
+TEXT_TO_VOICE_PATH = "tts_output.ogg"
 
 def start(update: Update, context: CallbackContext):
     user_name = update.message.from_user.first_name
-    keyboard = [['Изменить голос', 'Преобразовать голос в текст']]
+    keyboard = [['Изменить голос', 'Преобразовать голос в текст'], ['Текст в голос']]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     update.message.reply_text(
         f'Привет, {user_name}! 😊 Отправь мне голосовое сообщение, и я сделаю с ним что-нибудь интересное!\n'
@@ -43,16 +46,33 @@ def handle_text(update: Update, context: CallbackContext):
         context.user_data['action'] = 'transform'
         update.message.reply_text("Отправь голосовое сообщение")
 
+    elif text == 'Текст в голос':
+        context.user_data['action'] = 'tts'
+        update.message.reply_text("Отправь текст, который нужно озвучить")
+
     elif text == 'Назад':
         context.user_data.pop('action', None)
-        keyboard = [['Изменить голос', 'Преобразовать голос в текст']]
+        keyboard = [['Изменить голос', 'Преобразовать голос в текст'], ['Текст в голос']]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         update.message.reply_text("Возвращаемся назад\nВыбери действие", reply_markup=reply_markup)
+
+    elif context.user_data.get('action') == 'tts':
+        asyncio.run(text_to_speech(update, text))
+        context.user_data.clear()
 
 def transcribe_audio(audio_file, model_name):
     model = preloaded_models[model_name]
     result = model.transcribe(audio_file, language="ru")
     return result["text"]
+
+async def text_to_speech(update: Update, text: str):
+    tts = edge_tts.Communicate(text, voice="ru-RU-DmitryNeural")
+    await tts.save(TEXT_TO_VOICE_PATH)
+
+    with open(TEXT_TO_VOICE_PATH, 'rb') as f:
+        update.message.reply_voice(voice=InputFile(f), caption="Вот озвучка твоего текста")
+
+    os.remove(TEXT_TO_VOICE_PATH)
 
 def voice(update: Update, context: CallbackContext):
     action = context.user_data.get('action')
@@ -62,10 +82,7 @@ def voice(update: Update, context: CallbackContext):
         update.message.reply_text("Сначала выбери действие с помощью кнопок")
         return
 
-    message = update.message.reply_text(
-        "🌀 Ожидайте... Распознаю голосовое сообщение...",
-        parse_mode=ParseMode.MARKDOWN
-    )
+    message = update.message.reply_text("Распознаю голосовое сообщение...", parse_mode=ParseMode.MARKDOWN)
 
     file = update.message.voice.get_file()
     file_path = "voice.ogg"
@@ -98,10 +115,9 @@ def voice(update: Update, context: CallbackContext):
         update.message.reply_text(text)
 
     os.remove(file_path)
-
     message.delete()
 
-    keyboard = [['Изменить голос', 'Преобразовать голос в текст']]
+    keyboard = [['Изменить голос', 'Преобразовать голос в текст'], ['Текст в голос']]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     update.message.reply_text("Отправь новое голосовое сообщение или выбери другую опцию", reply_markup=reply_markup)
 
