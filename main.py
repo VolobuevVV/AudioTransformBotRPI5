@@ -8,9 +8,8 @@ import edge_tts
 
 BOT_TOKEN = '8101388926:AAEjCS7kwSp8EitsYo8m11rT4SeQzUsSf4M'
 
+# Используется только модель 'small' для распознавания
 preloaded_models = {
-    'tiny': whisper.load_model('tiny'),
-    'base': whisper.load_model('base'),
     'small': whisper.load_model('small'),
 }
 
@@ -32,13 +31,7 @@ def handle_text(update: Update, context: CallbackContext):
 
     if text == 'Преобразовать голос в текст':
         context.user_data['action'] = 'recognize'
-        keyboard = [['tiny', 'base', 'small'], ['Назад']]
-        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-        update.message.reply_text("Выбери модель для распознавания речи", reply_markup=reply_markup)
-
-    elif text in ['tiny', 'base', 'small'] and context.user_data.get('action') == 'recognize':
-        context.user_data['model'] = text
-        update.message.reply_text(f'Выбрана модель: {text}\nТеперь отправь голосовое сообщение 🎙')
+        update.message.reply_text("Отправь голосовое сообщение 🎙")
 
     elif text == 'Изменить голос (понизить тон)':
         context.user_data['action'] = 'transform'
@@ -50,7 +43,7 @@ def handle_text(update: Update, context: CallbackContext):
 
     elif text == 'Преобразовать голос в голос':
         context.user_data['action'] = 'voice_to_voice'
-        update.message.reply_text("Голос для озвучки выбран: Дмитрий. Теперь отправь голосовое сообщение.")
+        update.message.reply_text("Голос для озвучки выбран: Дмитрий. Отправь голосовое сообщение.")
 
     elif text == 'Назад':
         context.user_data.pop('action', None)
@@ -65,7 +58,8 @@ def handle_text(update: Update, context: CallbackContext):
         context.user_data.clear()
 
 def transcribe_audio(audio_file, model_name):
-    model = preloaded_models[model_name]
+    # Используется модель 'small' по умолчанию для распознавания
+    model = preloaded_models['small']
     result = model.transcribe(audio_file, language="ru")
     return result["text"]
 
@@ -81,8 +75,7 @@ async def text_to_speech(update: Update, text: str, context: CallbackContext):
     os.remove(TEXT_TO_VOICE_PATH)
 
 async def voice_to_voice(update: Update, file_path: str, context: CallbackContext):
-    model_name = context.user_data.get('model', 'tiny')
-    text = transcribe_audio(file_path, model_name)
+    text = transcribe_audio(file_path, 'small')  # Используем модель 'small' для распознавания
     voice = 'ru-RU-DmitryNeural'  # Голос Дмитрий выбран по умолчанию
 
     tts = edge_tts.Communicate(text, voice=voice)
@@ -128,8 +121,8 @@ def voice(update: Update, context: CallbackContext):
         os.remove(output_wav_path)
 
     elif action == 'recognize':
-        model_name = context.user_data.get('model', 'tiny')
-        text = transcribe_audio(file_path, model_name)
+        # Используется модель 'small' для распознавания
+        text = transcribe_audio(file_path, 'small')
         context.user_data['action'] = 'tts'
         context.user_data['text'] = text
         update.message.reply_text(f"Текст: {text}\nТеперь отправь текст для озвучки")
