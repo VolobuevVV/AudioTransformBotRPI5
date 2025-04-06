@@ -6,6 +6,7 @@ import whisper
 
 BOT_TOKEN = '8101388926:AAEjCS7kwSp8EitsYo8m11rT4SeQzUsSf4M'
 
+# Предзагрузка моделей
 preloaded_models = {
     'tiny': whisper.load_model('tiny'),
     'base': whisper.load_model('base'),
@@ -19,7 +20,7 @@ def start(update: Update, context: CallbackContext):
     keyboard = [['Изменить голос', 'Преобразовать голос в текст']]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     update.message.reply_text(
-        f'Привет, {user_name}! 😊 Отправь мне голосовое сообщение, и я изменю его тон 🎶\n'
+        f'Привет, {user_name}! 😊 Отправь мне голосовое сообщение, и я сделаю с ним что-нибудь интересное!\n'
         'Разработчик - Владимир Волобуев @volobuevv 👨‍💻',
         reply_markup=reply_markup
     )
@@ -37,10 +38,11 @@ def handle_text(update: Update, context: CallbackContext):
 
     elif text in ['tiny', 'base', 'small'] and context.user_data.get('action') == 'recognize':
         user_models[user_id] = text
-        update.message.reply_text(f'Выбрана модель: {text}\nТеперь отправь голосовое сообщение 🧠')
+        update.message.reply_text(f'Выбрана модель: {text}\nТеперь отправь голосовое сообщение 🎙')
 
     elif text == 'Изменить голос':
         context.user_data['action'] = 'transform'
+        update.message.reply_text("Отправь голосовое сообщение")
 
     elif text == 'Назад':
         context.user_data.pop('action', None)
@@ -93,10 +95,7 @@ def voice(update: Update, context: CallbackContext):
 
     os.remove(file_path)
 
-    keyboard = [['Изменить голос', 'Преобразовать голос в текст']]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-    update.message.reply_text("Выбери следующее действие", reply_markup=reply_markup)
-    context.user_data.clear()
+    context.user_data.clear()  # Очистим данные пользователя после завершения
 
 def main():
     updater = Updater(BOT_TOKEN)
