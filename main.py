@@ -40,15 +40,24 @@ def handle_text(update: Update, context: CallbackContext):
         user_models[user_id] = text
         update.message.reply_text(f'Выбрана модель: {text}\nТеперь отправь голосовое сообщение 🎙')
 
+        # Удалим сообщение пользователя после того, как бот ответит
+        update.message.delete()
+
     elif text == 'Изменить голос':
         context.user_data['action'] = 'transform'
         update.message.reply_text("Отправь голосовое сообщение")
+
+        # Удалим сообщение пользователя после того, как бот ответит
+        update.message.delete()
 
     elif text == 'Назад':
         context.user_data.pop('action', None)
         keyboard = [['Изменить голос', 'Преобразовать голос в текст']]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         update.message.reply_text("Возвращаемся назад\nВыбери действие", reply_markup=reply_markup)
+
+        # Удалим сообщение пользователя после того, как бот ответит
+        update.message.delete()
 
 def transcribe_audio(audio_file, model_name):
     model = preloaded_models[model_name]
@@ -94,6 +103,9 @@ def voice(update: Update, context: CallbackContext):
         update.message.reply_text(text)
 
     os.remove(file_path)
+
+    # Удаляем сообщение пользователя, после того как бот отправит свой ответ
+    update.message.delete()
 
     context.user_data.clear()  # Очистим данные пользователя после завершения
 
