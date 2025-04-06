@@ -6,7 +6,6 @@ import whisper
 
 BOT_TOKEN = '8101388926:AAEjCS7kwSp8EitsYo8m11rT4SeQzUsSf4M'
 
-# Предзагрузка моделей
 preloaded_models = {
     'tiny': whisper.load_model('tiny'),
     'base': whisper.load_model('base'),
@@ -58,19 +57,16 @@ def transcribe_audio(audio_file, model_name):
 def voice(update: Update, context: CallbackContext):
     action = context.user_data.get('action')
     user_id = update.message.from_user.id
-    model_name = user_models.get(user_id, 'tiny')
 
     if not action:
         update.message.reply_text("Сначала выбери действие с помощью кнопок")
         return
 
-    # Сообщение о начале процесса
     message = update.message.reply_text(
-        "🌀 Ожидайте... Распознаю голосовое сообщение.",
+        "🌀 Ожидайте... Распознаю голосовое сообщение...",
         parse_mode=ParseMode.MARKDOWN
     )
 
-    # Загружаем и обрабатываем голосовое сообщение
     file = update.message.voice.get_file()
     file_path = "voice.ogg"
     file.download(file_path)
@@ -97,15 +93,19 @@ def voice(update: Update, context: CallbackContext):
         os.remove(output_wav_path)
 
     elif action == 'recognize':
+        model_name = user_models.get(user_id, 'tiny')
         text = transcribe_audio(file_path, model_name)
         update.message.reply_text(text)
 
     os.remove(file_path)
 
-    # Удаляем сообщение ожидания
     message.delete()
 
-    context.user_data.clear()  # Очистим данные пользователя после завершения
+    keyboard = [['Изменить голос', 'Преобразовать голос в текст']]
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    update.message.reply_text("Отправь новое голосовое сообщение или выбери другую опцию", reply_markup=reply_markup)
+
+    context.user_data.clear()
 
 def main():
     updater = Updater(BOT_TOKEN)
