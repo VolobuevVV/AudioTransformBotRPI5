@@ -48,7 +48,9 @@ def handle_text(update: Update, context: CallbackContext):
 
     elif text == 'Текст в голос':
         context.user_data['action'] = 'tts'
-        update.message.reply_text("Отправь текст, который нужно озвучить")
+        keyboard = [['ru-RU-DmitryNeural', 'ru-RU-SvetlanaNeural'], ['Назад']]
+        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+        update.message.reply_text("Выбери голос для озвучки", reply_markup=reply_markup)
 
     elif text == 'Назад':
         context.user_data.pop('action', None)
@@ -57,7 +59,14 @@ def handle_text(update: Update, context: CallbackContext):
         update.message.reply_text("Возвращаемся назад\nВыбери действие", reply_markup=reply_markup)
 
     elif context.user_data.get('action') == 'tts':
-        asyncio.run(text_to_speech(update, text))
+        if text in ['ru-RU-DmitryNeural', 'ru-RU-SvetlanaNeural']:
+            context.user_data['voice'] = text
+            update.message.reply_text(f"Выбран голос: {text}\nТеперь отправь текст, который нужно озвучить")
+        else:
+            update.message.reply_text("Пожалуйста, выбери голос из предложенных вариантов.")
+
+    elif context.user_data.get('action') == 'tts' and 'voice' in context.user_data:
+        asyncio.run(text_to_speech(update, text, context))
         context.user_data.clear()
 
 def transcribe_audio(audio_file, model_name):
@@ -65,8 +74,9 @@ def transcribe_audio(audio_file, model_name):
     result = model.transcribe(audio_file, language="ru")
     return result["text"]
 
-async def text_to_speech(update: Update, text: str):
-    tts = edge_tts.Communicate(text, voice="ru-RU-DmitryNeural")
+async def text_to_speech(update: Update, text: str, context: CallbackContext):
+    voice = context.user_data.get('voice', 'ru-RU-DmitryNeural')  # Используем выбранный голос, по умолчанию - Дмитрий
+    tts = edge_tts.Communicate(text, voice=voice)
     await tts.save(TEXT_TO_VOICE_PATH)
 
     with open(TEXT_TO_VOICE_PATH, 'rb') as f:
