@@ -1,11 +1,10 @@
-import torch
 from telegram import Update, InputFile, ReplyKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from pydub import AudioSegment
 import os
 import whisper
 
-BOT_TOKEN = '8101388926:AAEjCS7kwSp8eitsYo8m11rT4SeQzUsSf4M'
+BOT_TOKEN = '8101388926:AAEjCS7kwSp8EitsYo8m11rT4SeQzUsSf4M'
 
 preloaded_models = {
     'tiny': whisper.load_model('tiny'),
